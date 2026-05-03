@@ -108,9 +108,9 @@ def project(
             warnings=warnings,
         )
 
-    except Exception:
-        cleanup_workdir(wd, is_temp, keep_workdir)
-        raise
+    finally:
+        if not keep_workdir:
+            cleanup_workdir(wd, is_temp, keep=False)
 
 
 def _find_project_outputs(

@@ -120,13 +120,9 @@ def stereoGene(
             warnings=warnings,
         )
 
-    except Exception:
-        cleanup_workdir(wd, is_temp, keep_workdir)
-        raise
-
     finally:
-        if not keep_workdir and is_temp:
-            pass
+        if not keep_workdir:
+            cleanup_workdir(wd, is_temp, keep=False)
 
 
 def _build_pair_results(stdout: str, workdir: Path) -> list[PairResult]:

@@ -91,9 +91,9 @@ def bin_track(
             warnings=warnings,
         )
 
-    except Exception:
-        cleanup_workdir(wd, is_temp, keep_workdir)
-        raise
+    finally:
+        if not keep_workdir:
+            cleanup_workdir(wd, is_temp, keep=False)
 
 
 def _find_bin_outputs(workdir: Path, tracks: list[str | Path], bin_size: int) -> list[Path]:
