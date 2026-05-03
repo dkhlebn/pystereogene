@@ -1,0 +1,8 @@
+include README.md
+include LICENSE
+
+recursive-include pystereogene/_vendor/src *.cpp *.c *.h *.mak Makefile ccvars hg18_chrom hg19_chrom
+recursive-include pystereogene/_vendor/bin *
+
+recursive-include pystereogene/tests *.py
+recursive-include pystereogene/tests/data *

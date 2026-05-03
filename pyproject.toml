@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pystereogene"
+version = "2.50.0"
+description = "Python wrapper for StereoGene genome-wide correlation analysis"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "StereoGene Team"},
+]
+keywords = ["bioinformatics", "genomics", "correlation", "epigenomics", "ChIP-seq"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "numpy>=1.22",
+]
+
+[project.optional-dependencies]
+full = [
+    "pandas>=1.5",
+    "matplotlib>=3.5",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/favorov/stereogene"
+Documentation = "https://github.com/favorov/stereogene"
+Repository = "https://github.com/favorov/stereogene"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pystereogene*"]
+
+[tool.setuptools.package-data]
+"pystereogene" = [
+    "_vendor/bin/*",
+    "_vendor/src/hg18_chrom",
+    "_vendor/src/hg19_chrom",
+    "_vendor/src/*.cpp",
+    "_vendor/src/*.c",
+    "_vendor/src/*.h",
+    "_vendor/src/*.mak",
+    "_vendor/src/Makefile",
+    "_vendor/src/ccvars",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
