@@ -34,7 +34,7 @@ ProfileHist dHist(100000);
 ProfileHist NormWHist(500);
 
 
-double LClogScale=1000;
+//double LClogScale=1000;
 
 
 float normLC(float lc){	//normalize Local correlation with LCScale parameter
@@ -152,7 +152,18 @@ void addLCProf(double *f, int pos){
 	}
 }
 
-
+//void getMinMax(FloatArray *a, double &vMin, double &vMax){
+//	vMin=1.e+55; vMax=-1.e+10;
+//	for(int i=0; i<profileLength; i++){
+//		double v=a->get(i);
+//		if(v==FNA)continue;
+//		if(v > 10000){
+//			deb("pos=%i  v=%.2f FNA=%.2f",i,v, FNA);
+//		}
+//		if(vMin > v) vMin=v;
+//		if(vMax < v) vMax=v;
+//	}
+//}
 
 
 //===================== Write the local correlation into the bedGraph file =====
@@ -166,6 +177,8 @@ void writeLC(){
 	}
 	verb("\nwrite Local Correlations\n");
 	renormDistrib();
+//double vMin=0, vMax=0;
+//getMinMax(lcProfile,vMin, vMax);
 	writeBedGr(outFile, lcProfile, L_LC,R_LC);
 	//========================================== Write histograms ===============
 	if(writeDistr) {
@@ -181,7 +194,7 @@ void writeLC(){
 void initOutLC(){
 	if(!outLC) return;
 	if(lcProfile==0) lcProfile=new FloatArray();
-	lcProfile->init(NA);
+	lcProfile->init(FNA);
 }
 
 
@@ -279,8 +292,8 @@ void writeBedGr(const char *fname, FloatArray *array, float lTreshold, float rTr
 
 void writeBedGr(FILE* f, FloatArray *array, float lTreshold, float rTreshold){
 	ScoredRange pos, pos0;
-	if(lTreshold == NA) lTreshold= 1.e+8;
-	if(rTreshold == NA) rTreshold=-1.e+8;
+	if(lTreshold == FNA) lTreshold= 1.e+8;
+	if(rTreshold == FNA) rTreshold=-1.e+8;
 	for(int i=0; i<profileLength; i++){
 		if(i%1000000 ==0) {verb("%5.1f%%\r",1.*i/profileLength*100);}
 		float x=array->get(i);

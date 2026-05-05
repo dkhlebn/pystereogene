@@ -5,6 +5,7 @@
  *      Author: Mironov
  */
 #include "track_util.h"
+#include "parsePrm.h"
 #include <sys/file.h>
 
 void printR(int type);
@@ -559,10 +560,18 @@ void printR(int type){
 void printParamNames(FILE* f){
 	fprintf(f,"id\tversion");
 	for(int i=0; pparams[i] ; i++){
-		if(pparams[i]->printFg && (pparams[i]->prog&progType)) fprintf(f,"\t%s",pparams[i]->name);
+		if(pparams[i]->printFg && (pparams[i]->prog_fg&prog_flag)) fprintf(f,"\t%s",pparams[i]->name);
 	}
 	fprintf(f,"\n");
 }
+
+char *pdfFlag(){
+	return strdup(RScriptFg&PDF ? "ON" : "OFF");
+}
+char *HTMLFlag(){
+	return strdup(RScriptFg&HTML ? "ON" : "OFF");
+}
+
 NamedRes *results[]={
 		new NamedRes("id",printId),
 		new NamedRes("Date",dateTime),
@@ -581,8 +590,8 @@ NamedRes *results[]={
 		new NamedRes("BgCorr_sd",&sdBg),
 		new NamedRes("Mann-Z",&mannW_Z),
 		new NamedRes("p-value",&mannW_p),
-		new NamedRes("PDF_report" ,&r_pdf),
-		new NamedRes("HTML_report",&r_html),
+		new NamedRes("PDF_report" ,&pdfFlag),
+		new NamedRes("HTML_report",&HTMLFlag),
 		0
 };
 
@@ -607,7 +616,7 @@ void printParams(FILE* f){
 	char b[4096];
 	fprintf(f,"%08lx\t%s",id,version);
 	for(int i=0; pparams[i] ; i++){
-		if(pparams[i]->printFg && (pparams[i]->prog&progType))
+		if(pparams[i]->printFg && (pparams[i]->prog_fg&prog_flag))
 			fprintf(f,"\t%s",pparams[i]->printParamValue(b, sizeof(b)));
 	}
 	fprintf(f,"\n");
@@ -615,7 +624,7 @@ void printParams(FILE* f){
 void printXMLparams(FILE *f){
 	char b[4096];
 	for(int i=0; pparams[i] ; i++){
-		if(pparams[i]->printFg && (pparams[i]->prog&progType))
+		if(pparams[i]->printFg && (pparams[i]->prog_fg&prog_flag))
 			fprintf(f,"%s=\"%s\" ",pparams[i]->name,pparams[i]->printParamValue(b, sizeof(b)));
 	}
 }
@@ -649,7 +658,7 @@ void printXML(FILE *f){
 	}
 	fprintf(f,"/>\n\t<prm ");
 	for(int i=0; pparams[i] ; i++){
-		if(pparams[i]->printFg && (pparams[i]->prog&progType))
+		if(pparams[i]->printFg && (pparams[i]->prog_fg&prog_flag))
 			fprintf(f,"%s=\"%s\" ",pparams[i]->name, pparams[i]->printParamValue(b,sizeof(b)));
 	}
 	fprintf(f,"/>\n</run>\n");

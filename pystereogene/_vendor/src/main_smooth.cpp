@@ -5,46 +5,18 @@
  *      Author: Mironov
  */
 #include "track_util.h"
+#include "parsePrm.h"
 
-
-const char * progName="Smoother";
-const int progType=SM;
-
-
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The Smoother program creates smoothed track using a kernel\n");
-	printf("Usage:\n");
-	printf("$ ./Smoother [-parameters] track1 track2 ...\n");
-	printf("\n");
-}
-void printMiniHelp(){
-	printf("\n");
-	printf("The Smoother program creates smoothed track using a kernel\n");
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./Smoother [-parameters] track1 track2 ...\n");
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
 //=====================================================================
 double *smoothProf=0;
 double *smTmp=0;
 
-
-
-
 void smooth(const char *fname){
 	outLC=1;
-
+	verb("\nSmooth %s",fname);
 	initOutLC();
 	int l=profileLength;
 	bTrack *tr=new bTrack(fname);
-
 	for(int i=0,k=0; i<l; i+=wProfStep,k++){
 		double d;
 		d=100.*k/(l/wProfStep);
@@ -57,7 +29,6 @@ void smooth(const char *fname){
 		calcSmoothProfile(&(kern->fx),0, 0);	// calculate smooth ptrofile c=\int f*\rho
 		addLCProf(LCorrelation.re,i);
 	}
-
 	//================ normalize
 	double tt=0,ee=0,dd=0,nn=0;
 	for(int i=0; i<l; i++) {
@@ -72,13 +43,10 @@ void smooth(const char *fname){
 		else	   {x=x*tr->total/tt/binSize;}
 		lcProfile->set(i,x);
 	}
-
 	char b[TBS];
 	tr->makePath(smoothPath);
 	tr->makeExtFname(b,smoothPath,"sm","bgr");
-
 	FILE *f=xopen(b,"w");
-
 	getFnameWithoutExt(b,fname);
 	fprintf(f,"track type=bedGraph name=\"%s_Sm\" description=\"Smoothed track. Width=%i\"\n",b, kernelSigma);
 	verb("\n Write Smooth profile...\n");
@@ -95,7 +63,6 @@ void Smoother(){
 	outLC=LC_BASE;
 	getMem(LCorrelation.datRe,profWithFlanksLength, "Correlator");
 
-
 	for(int i=0; i<nfiles; i++){
 		char *fname=files[i].fname;
 		if(fname==0 || strlen(trim(fname))==0) continue;
@@ -106,9 +73,17 @@ void Smoother(){
 
 //=====================================================================
 int main(int argc, char **argv) {
-	initSG(argc, argv);
-	Preparator();
+//	debugFg=DEBUG_LOG|DEBUG_PRINT;clearDeb();
 
+	prog_flag=SM;
+	progDescription="\
+The Smoother program creates smoothed track using a kernel\n\
+Usage:\n\
+$ ./Smoother [-parameters] track1 track2 ...";
+	_version=version;
+	initSG(argc, argv);
+	PrepareParams();
+	Preparator();
 	Smoother();
 	fflush(stdout);
 	fclose(stdout);

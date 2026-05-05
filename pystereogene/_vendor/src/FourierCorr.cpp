@@ -5,9 +5,7 @@
  *      Author: Mironov
  */
 #include "track_util.h"
-
-
-
+#include "parsePrm.h"
 
 double *BkgSet=0, *FgSet=0;			// background and foreground sets of the correlations
 int nBkg, nFg;					// size of background and foreground sets of data
@@ -339,7 +337,6 @@ int distrCorr(){
 	else{
 		track1->finStatistics(); track2->finStatistics();
 		avFg/=n_corr;
-		finOutLC();
 		totCorr=calcCC();
 //		xverb("\nCorrelation=%f\naverage Corrrelation=%f\n",totCorr, avFg);
 		xverb("\nCorrelation=%f\n", avFg);
@@ -433,7 +430,7 @@ int Correlator(){
 	id=0;	// id is undefined yet
 	//================================================================== print parameters
 	verb("========== Parameters ===========\n");
-	if (confounder != 0) verb("==         pcorProfile=<%s>\n", confounder);
+	if (confFile != 0) verb("==         pcorProfile=<%s>\n", confFile);
 	verb("===        bin=%i\n",binSize);
 	verb("==         wSize=%i\n",wSize);
 	verb("==         kernelSigma=%i\n",kernelSigma);
@@ -444,10 +441,10 @@ int Correlator(){
 	//============ Read Map File
 
 
-	if(confounder) {
+	if(confFile) {
 		projTrack=new bTrack();
 		verb("read confounder...\n");
-		projTrack->openTrack(confounder);
+		projTrack->openTrack(confFile);
 	}
 	int n_cmp=0;
 	int nnf=nfiles; if(nnf>1) nnf--;
@@ -476,7 +473,7 @@ int Correlator(){
 			if(track1) {del(track1); track1=0;}
 			track1=trackFactory(trackName1);
 			trackName1=track1->name;
-			if(confounder) track1->ortProject();
+			if(confFile) track1->ortProject();
 			if(!track1->makeIntervals()){continue;}
 		}
 
@@ -488,7 +485,7 @@ int Correlator(){
 			if(track2) {del(track2); track2=0;}
 			track2=trackFactory(trackName2);
 			trackName2=track2->name;
-			if(confounder) track2->ortProject();
+			if(confFile) track2->ortProject();
 			if(!track2->makeIntervals()) {continue;}
 		}
 
@@ -519,6 +516,7 @@ int Correlator(){
 		if(localShuffle) distrBkgCycle();		// Make background distribution with cycling window
 		else 			distrBkg();				// Make background distribution with shuffling windows
 		writeLog("Correlations -> Done\n");
+		printStat();							// write report. The avCoor & avSD defined here!
 		if(nFg && nBkg){
 			printCorrelations();				// write correlations
 			if(RScriptFg) {
@@ -528,7 +526,6 @@ int Correlator(){
 		else{
 			xverb("*** <%s>: No data for statistics: nFg=%i nBkg=%i ***\n", outFile,nFg, nBkg);
 		}
-		printStat();							// write report. The avCoor & avSD defined here!
 		n_cmp++;
 		if(outLC) finOutLC();
 		writeLog("<%s> => Done  time=%s\n",outFile,thisTimer.getTime());

@@ -5,6 +5,9 @@
  *      Author: Mironov
  */
 #include "track_util.h"
+#include "parsePrm.h"
+
+//C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../lib/libmingw32.a(lib64_libmingw32_a-crtexewin.o): in function `main':	sgx		 	C/C++ Problem
 
 
 void failParam(const char* s){
@@ -250,7 +253,7 @@ BuffArray::~BuffArray(){
 	close();
 }
 //==========================================================================
-void FloatArray::init(int na){
+void FloatArray::init(float na){
 	if(f==0){                //===================== simple array without file
 		for(int i=0; i<profileLength; i++) val[i]=na;	//== fill initial values
 		return;
@@ -385,7 +388,7 @@ void bTrack::setName(const char *inFname){
 	if(s!=0) {
 		s[1]=0;
 		path=strdup(b); //============= PATH CONTAINS '/'
-		if((progType & (BN)) ==0){	//========= binner not require creating profPath
+		if((prog_flag & (BN)) ==0){	//========= binner not require creating profPath
 			makePath(profPath);
 		}
 	}
@@ -657,7 +660,7 @@ double bTrack::getValue(int pos, int cmpl){
 //====================================== calculate projection to orthogonal subspace
 void Track::ortProject(){
 	projCoeff=0;
-	if(confounder==0) return;
+	if(confFile==0) return;
 	double xy=0, xx=0;
 	for(int i=0; i<profileLength; i++){
 		double x,y;
@@ -779,6 +782,17 @@ void Model::readModel(const char *fnam){
 	for(int i=0; i<form->nTracks; i++){
 		getTrack(i)->readTrack(getTrackName(i));
 	}
+	int nn=0;
+	double ee=0, dd=0;
+	for(int i=0; i<profileLength; i++){
+		if(isNA(i,0)) continue;
+		double v=getValue(i,0);
+		nn++; ee+=v; dd+=v*v;
+		v=getValue(i,1);
+		nn++; ee+=v; dd+=v*v;
+	}
+	ee/=nn; dd=dd/nn-ee*ee;
+	av=ee; sd=sqrt(dd);
 }
 
 

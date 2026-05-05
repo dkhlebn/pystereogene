@@ -1,6 +1,6 @@
 # pystereogene
 
-Python wrapper for [StereoGene](https://github.com/favorov/stereogene) — genome-wide correlation analysis of continuous or interval genomic features using kernel convolution and FFT.
+Python wrapper for [StereoGene](https://github.com/favorov/stereogene) (v2.51) — genome-wide correlation analysis of continuous or interval genomic features using kernel convolution and FFT.
 
 ## Installation
 

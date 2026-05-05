@@ -1,4 +1,5 @@
 #include "track_util.h"
+#include "parsePrm.h"
 
 
 //=========================================
@@ -25,39 +26,15 @@ void testMtx(){
 }
 
 
-const char * progName="Confounder";
-const int progType=SG;
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The Confounder program creates a confounder track using set of the tracks\n");
-	printf("Usage:\n");
-	printf("$ ./parse_genes [-parameters] [RefSeq or GENECODE file]\n");
-	printf("\n");
-}
-
-
-void printMiniHelp(){
-	printf("\n");
-	printf("The Confounder program creates a confounder track using set of the tracks\n");
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./%s [-parameters] trackFile_1 trackFile_2 ... trackFile_n\n",progName);
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
-
-
 int main(int argc, char **argv) {
-	debugFg=3; if(debugFg) clearDeb();
+//	debugFg=3;
+	prog_flag=CNF;
 //	testMtx();
-
-
+	progDescription="The Confounder program creates a confounder track using set of the tracks\n\
+Usage:\n\
+$ ./Confounder [-parameters] <list file>\n";
+	_version=version;
 	initSG(argc, argv);
-
 
 	Preparator();
 	Covariator();

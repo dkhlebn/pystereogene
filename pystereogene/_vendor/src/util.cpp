@@ -485,7 +485,8 @@ char* makeFileName(char *b, char *path, char*fname){
 	if(path==0) return strcpy(b,fname);
 	strcpy(b,path);
 	if(*(lastChar(b)) != '/') strcat(b,"/");
-	return strcat(b,fname);
+	strcat(b,fname);
+	return b;
 }
 //================= create filename using path and name
 char *makeFileName(char *b, char *path, char*fname, const char*ext){
@@ -493,7 +494,8 @@ char *makeFileName(char *b, char *path, char*fname, const char*ext){
 	makeFileName(bb,path,fname);
 	char *s=strrchr(bb,'/'); if(s==0) s=bb;
 	char *sp=strrchr(s,'.'); if(sp  ) *sp=0;
-	return strcat(strcat(b,"."),ext);
+	strcat(strcat(bb,"."),ext);
+	return strcpy(b,bb);
 }
 //=================== extract fname wothout path
 char *getFnameWithoutPath(char *buf, const char *fname){
@@ -510,6 +512,14 @@ char *getFnameWithoutExt(char *buf, const char *fname){
 	return buf;
 }
 
+//================== make path - add '/' if necessary
+char* makePath(char* pt){
+	if(pt==0 || *pt==0) return pt;
+	char b[TBS];
+	char *s=pt+strlen(pt)-1;
+	if(*s=='/') *s=0;
+	return strdup(strcat(strcpy(b,pt),"/"));
+}
 
 //===================== platform independent Make Directory
 int _makeDir(const char * path){

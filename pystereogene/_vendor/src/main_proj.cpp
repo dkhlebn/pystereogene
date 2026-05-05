@@ -5,37 +5,19 @@
  *      Author: andrey
  */
 #include "track_util.h"
-
-
-const char * progName="Projection";
-const int progType=SG;
-
-
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The Projection program creates tracks with exclusion of the defined confounder\n");
-	printf("Usage:\n");
-	printf("$ ./Projection [-parameters] track1 track2 ...\n");
-	printf("\n");
-}
-void printMiniHelp(){
-	printf("\n");
-	printf("The Projection program creates tracks with exclusion of the defined confounder\n");
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./Projection [-parameters] track1 track2 ...\n");
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
+#include "parsePrm.h"
 
 
 int main(int argc, char **argv) {
-	clearDeb(); debugFg=DEBUG_LOG|DEBUG_PRINT;
-	confounder=strdup("confounder.bgraph");
+//	clearDeb(); debugFg=DEBUG_LOG|DEBUG_PRINT;
+	prog_flag=PRJ;
+	confFile=strdup("confounder.bgraph");
+	progDescription="\
+The Projection program creates tracks with exclusion of the defined confounder\n\
+Usage:\n\
+$ ./Projection [-parameters] track1 track2 ...";
+	_version=version;
+
 	initSG(argc, argv);
 
 	Preparator();

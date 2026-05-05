@@ -5,36 +5,12 @@
  *      Author: Mironov
  */
 #include "track_util.h"
-
-
-const char * progName="Binning";
-const int progType=BN;
-
-
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The Binning program create a track with binned data\n");
-	printf("Usage:\n");
-	printf("$ ./binning [-parameters] track1 track2 ...\n");
-	printf("\n");
-}
-void printMiniHelp(){
-	printf("\n");
-	printf("The Binning program create a track with binned data\n");
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./binning [-parameters] track1 track2 ...\n");
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
+#include "parsePrm.h"
 
 
 void binning(const char *fname){
 	bTrack *tmp=new bTrack();
+
 	tmp->writeBinnedProf(fname);
 	del(tmp);
 	if(fProfile) del(fProfile);
@@ -42,10 +18,13 @@ void binning(const char *fname){
 
 
 int main(int argc, char **argv) {
- {clearDeb(); debugFg=DEBUG_LOG|DEBUG_PRINT;}
-	initSG(argc, argv);
-
-
+// {debugFg=DEBUG_LOG|DEBUG_PRINT; clearDeb(); }
+ prog_flag=BN;
+ progDescription="\nThe Binning program create a track with binned data\n\
+ Usage:\n\
+ $ ./binning [-parameters] track1 track2 ...";
+ _version=version;
+ 	initSG(argc, argv);
 	for(int i=0; i<nfiles; i++){
 		char *fname=files[i].fname;
 		if(fname==0 || strlen(trim(fname))==0) continue;

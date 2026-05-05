@@ -4,6 +4,10 @@
  *  Created on: 05 Dec. 2017
  *      Author: Mironov
  */
+
+#ifndef UTIL_H_
+#define UTIL_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,9 +21,6 @@
 #include <sys/stat.h>
 
 
-
-#ifndef UTIL_H_
-#define UTIL_H_
 
 const int TBS=4096;			//(Temporary Buffer Size) size of buffers for filenames etc
 
@@ -35,6 +36,11 @@ const  int NARROW_PEAK=5;
 const  int MODEL_TRACK=8;
 const  int CAGE_MIN=16;
 
+#define BINVAL short
+const  BINVAL NA=0x8080;
+const double FNA=-3.456781345e-5;
+const  BINVAL MAX_SHORT=32000;
+
 
 const int LRAND_MAX=(RAND_MAX > 0XFFFFF)?RAND_MAX : 0x3fffffff;
 
@@ -43,7 +49,7 @@ extern unsigned long id;
 extern char *logFileName;
 extern char *repFile;		// reports filename
 extern bool  silent;				// inhibit stdout
-extern bool  verbose;				// number of suffle
+extern bool  verbose;				//
 
 
 
@@ -149,6 +155,8 @@ bool fileExists(const char *fname);				// check if the file exists
 //bool fileExists( char* path,  char *fname);				// check if the file exists
 //bool fileExists( char* path,  char *fname, const char *ext); // check if the file exists
 const char *getExt(const char *fname);					// extract file extension
+char *makePath(char* pt);					// Make path - add '/' to the end of pathname
+
 void makeDir(const char *path);
 unsigned long getFileTime(const char *fname);
 char *correctFname(char* s);			// remove fucking MS Widows backslash

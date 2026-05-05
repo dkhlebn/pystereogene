@@ -11,7 +11,6 @@ bTrack **tracks;
 CovarMtx cMtx;
 VectorX *eVector=0;
 double   eValue=0;
-char* confFile=0;
 
 
 void Confounder(){
@@ -78,7 +77,7 @@ void CovarMtx::init(int nn){
 	getMem(cov  ,n2 ,"covar1");	 zeroMem(cov,  n2);
 	getMem(mean ,n  ,"covar2");  zeroMem(mean,n);
 	getMem(sd   ,n  ,"covar2");  zeroMem(sd,n);
-	getMem(count,n  ,"covar3");  zeroMem(count,n2);
+	getMem(count,n2 ,"covar3");  zeroMem(count,n2);
 }
 
 
@@ -165,7 +164,6 @@ void CovarMtx::print(FILE *f){
 
 void calcCovar(){
 	CovarMtx *cMtx=new CovarMtx(nfiles);
-
 	for(int i=0; i<nfiles; i++){
 		for(int j=i; j<nfiles; j++){
 			verb("Covariations %i~%i: <%s>~<%s> ",i,j,tracks[i]->name,tracks[j]->name);

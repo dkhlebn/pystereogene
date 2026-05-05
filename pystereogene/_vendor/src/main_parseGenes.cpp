@@ -1,4 +1,5 @@
 #include "track_util.h"
+#include "parsePrm.h"
 
 char *type_filter[200];
 
@@ -13,10 +14,6 @@ FILE *fe_end ;
 FILE *fivs   ;
 FILE *fi_beg ;
 FILE *fi_end ;
-
-const int progType=PG;
-const char * progName="parse_genes";
-
 
 struct nameList{
 	char ** names;
@@ -47,9 +44,6 @@ char * nameList::getName(char *s){
 
 nameList chromosomes=nameList();
 nameList genetypes  =nameList();
-
-
-
 
 long readInt_pg(){
 	char *s=strtok(0," \t\n\r");
@@ -520,34 +514,18 @@ void parseGTF(){
 
 //============================================================================
 //============================================ Print Help page =========================================
-void printMiniHelp(){
-	printf("\n");
-	printf("The parse_genes program creates bed files for genes/exons/introns starts/bodies/ends\n");
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./parse_genes [-parameters] [RefSeq or GENECODE file]\n");
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The parse_genes program creates bed files for genes/exons/introns starts/bodies/ends\n");
-	printf("Usage:\n");
-	printf("$ ./parse_genes [-parameters] [RefSeq or GENECODE file]\n");
-	printf("\n");
-}
-
-
-
-
 int main(int argc, char **argv) {
 	char b[5100];
 	verbose=true;
+	prog_flag=PG;
 //	debugFg=DEBUG_LOG|DEBUG_PRINT;
+
+	progDescription="\
+The parse_genes program creates bed files for genes/exons/introns starts/bodies/ends\n\
+Usage:\n\
+$ ./parse_genes [-parameters] [RefSeq or GENECODE file]";
+	_version=version;
+
 	parseArgs(argc, argv);
 	if(nfiles < 1) {printf("no input file defined"); return 0;}
 	strcpy(inFile, trim(files[0].fname));

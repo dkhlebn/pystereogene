@@ -69,7 +69,7 @@ void makeProj(){
 		curTrack->makeFname(b,confTrackPath,"bgraph");
 		FILE *f=xopen(b,"wt");
 		fprintf(f,"track type=wiggle_0 ");
-		fprintf(f,"description=\"%s_projection_%s\" \n",curTrack->name,confounder);
+		fprintf(f,"description=\"%s_projection_%s\" \n",curTrack->name,confFile);
 		verb("Write profile %s...\n", curTrack->name);
 		writeBedGr(f, fProfile);
 		verb("\n");
@@ -112,7 +112,7 @@ void Projector(){
 	if(fileExists(defaultConfig))	//referense to existing profile file
 		cfgFile=strdup(defaultConfig);
 
-	confBTrack	=new bTrack(confounder);
+	confBTrack	=new bTrack(confFile);
 	curTrack	=new bTrack();
 	projT	=new bTrack();
 
@@ -131,7 +131,7 @@ void Projector(){
 
 	profPath =confProfPath;
 	prjLog=xopen("projections","w");
-	fprintf(prjLog,"confounder=<%s>\n",confounder);
+	fprintf(prjLog,"confounder=<%s>\n",confFile);
 	fprintf(prjLog,"track\tminVal\tmaxVal\te\tproj_coef\n");
 
 

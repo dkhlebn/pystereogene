@@ -9,6 +9,7 @@
 #ifndef SG_UTIL_H_
 #define SG_UTIL_H_
 
+#include "util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,6 @@ struct Model;
 struct BuffArray;
 
 
-extern const int progType;	//type of the program
 const int SG =1;	//=== Stereogene
 const int PRJ=2;	//=== Projector
 const int CNF=4;	//=== Confounder
@@ -48,12 +48,7 @@ const int AP=SG|PRJ|CNF|PG|SM|BN;
 #define DERIV '_'
 
 
-#define BINVAL short
 
-
-const  BINVAL NA=0x8080;
-const double FNA=9.99999999e+128;
-const  BINVAL MAX_SHORT=32000;
 extern const char* version;
 
 
@@ -106,9 +101,7 @@ const  int AV_SCORE=2;
 
 
 const  int LOG_SCALE =1;
-const  int LOG_LOG_SCALE =2;
 const  int LIN_SCALE =0;
-const  int AUTO_SCALE=2;
 
 
 const  int WIG_BASE=1;
@@ -148,7 +141,7 @@ extern char *resPath;		// path to the results files (tracks and distributions)
 extern char *reportPath;	// path to the report files relative to the resPath
 extern const char*defaultConfig;
 extern char *cfgFile;		// config file name
-extern char *confounder;		// confounder file name
+extern char *confFile;		// confounder file name
 extern char *statFileName;	// File name for cummulative statistics
 extern char *paramsFileName; // Filename for save parameters of runs
 //extern char *idSuff;
@@ -576,7 +569,7 @@ private:
 public:
 	~FloatArray();
 	FloatArray();
-	void init(int na);
+	void init(float na);
 	float get(int pos);						// read and remove NA
 	float getLog(int pos);					// read and remove NA and log(z+1)
 	void set(int pos, float v);
@@ -834,7 +827,7 @@ Matrix * eigenVectors(Matrix *x, double *EValues, int nIter, double precsision);
 
 //==================================================================================================
 //==================================================================================================
-
+/*
 struct Name_Value{			// symbolic name for a value
 	const char* name;		// name for the value
 	int value;				// value
@@ -887,8 +880,10 @@ struct NamedRes{
 
 extern Param *pparams[];
 extern NamedRes *results[];
+*/
 //=====================================================================
 //=====================================================================
+
 extern Chromosome *chrom_list;       // list of chromosomes
 extern int n_chrom;
 extern Chromosome *curChrom;
@@ -937,12 +932,12 @@ void addChromStat(int pos, bool cmpl1,bool cmpl2,double corr);
 
 
 char* getMajorVer(const char *ver, char *buf);
-int  getFlag(char*s);
+//int  getFlag(char*s);
 //=============================== File names ===========================
+void initSG(int argc, char **argv);
 void parseArgs(int argc, char **argv);
 //char *makeFileName0(char *b, const char *path, const char*fname, const char*ext);	// make filename using path, name and extension
 char *cfgName(char* p, char* ext);			// Make config file name
-char *makePath(char* pt);					// Make path - add '/' to the end of pathname
 void makeDirs();
 int   getTrackType(const char *fname);
 void addList(char* fname);			// Add filename to file list

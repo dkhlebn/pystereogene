@@ -1,5 +1,5 @@
 #include "track_util.h"
-
+#include "parsePrm.h"
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -20,47 +20,6 @@
 // deb("OK");
 
 
-const char * progName="StereoGene";
-const int progType=SG;
-
-
-void printMiniHelp(){
-	printf("\n");
-	printf("The %s program compares pairs of tracks and calculates kernel correlations\n",progName);
-	printf("===========  version %s ========\n",version);
-	printf("Usage:\n");
-	printf("$ ./%s [-parameters] trackFile_1 trackFile_2 ... trackFile_n\n",progName);
-	printf("\n");
-	printf("Say %s -h for more information\n",progName);
-	printf("\n");
-	exit(0);
-}
-
-
-void printProgDescr(){
-	printf("\n");
-	printf("The StereoGene program compares pairs of tracks and calculates kernel correlations\n");
-	printf("Usage:\n");
-	printf("$ ./StereoGene [-parameters] trackFile_1 trackFile_2 ... trackFile_n\n");
-	printf("\n");
-}
-
-
-//============================================ Tests =========================================
-void test(const char* path){
-	clearDeb();
-	debugFg=DEBUG_LOG|DEBUG_PRINT;
-
-	readInt("99");
-	readInt("99kb");
-	readInt("99 kb");
-	readInt("99 kb");
-	readInt("99 k");
-	readInt("99Mb");
-
-exit(0);
-}
-
 //=========================================================================
 //=========================================================================
 //=========================================================================
@@ -70,8 +29,12 @@ exit(0);
 
 int main(int argc, char **argv) {
 //	test("../Tracks/RCDB_all_to_all");
-	clearDeb();	debugFg=DEBUG_LOG|DEBUG_PRINT;
-
+//	debugFg=DEBUG_LOG|DEBUG_PRINT; clearDeb();
+	progDescription="The StereoGene program compares pairs of tracks and calculates kernel correlations\n\
+Usage:\n\
+$ ./StereoGene [-parameters] trackFile_1 trackFile_2 ... trackFile_n";
+	_version=version;
+	prog_flag=SG;
 	initSG(argc, argv);
 	writeLog("====== Start ====== deb=%i\n",debugFg);
 

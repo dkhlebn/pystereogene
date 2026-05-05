@@ -7,6 +7,7 @@
 
 
 #include "track_util.h"
+#include "parsePrm.h"
 
 unsigned int hashx(unsigned int h,char c){
 	return h+(c-32)+1234;
@@ -296,19 +297,11 @@ const char*getKernelType(){
 
 
 
-//================== make path - add '/' if necessary
-char* makePath(char* pt){
-	if(pt==0 || *pt==0) return pt;
-	char b[TBS];
-	char *s=pt+strlen(pt)-1;
-	if(*s=='/') *s=0;
-	return strdup(strcat(strcpy(b,pt),"/"));
-}
 
 
 //================= Create directories
 void makeDirs(){
-	if((progType & (BN)) == 0){	//========= binner not require creating profPath
+	if((prog_flag & (BN)) == 0){	//========= binner not require creating profPath
 		if(profPath!=0) makeDir(profPath);
 		else profPath=strdup("");
 		if(resPath!=0) makeDir(resPath);
@@ -316,13 +309,13 @@ void makeDirs(){
 	}
 	if(trackPath!=0) makeDir(trackPath);
 	else trackPath=strdup("");
-	if((progType & (BN)) !=0){	//========= only binner requires creating BinPath
+	if((prog_flag & (BN)) !=0){	//========= only binner requires creating BinPath
 		if(binPath!=0  &&  binPath[0] !=0 ) makeDir(binPath);
-		else trackPath=strdup("");
+		else binPath=trackPath;
 	}
-	if((progType & (SM)) !=0){	//========= only binner requires creating BinPath
+	if((prog_flag & (SM)) !=0){	//========= only Smoother requires creating SmoothPath
 		if(smoothPath!=0 && smoothPath[0] != 0) makeDir(smoothPath);
-		else trackPath=strdup("");
+		else smoothPath=trackPath;
 	}
 }
 
@@ -360,14 +353,6 @@ return qMin;
 }
 
 
-//===================== convert text flag to a binary
-int getFlag(char*s){
-	int fg=0;
-	if(		keyCmp(s,"1")==0 || keyCmp(s,"YES")==0 || keyCmp(s,"ON" )==0) {fg=1;}
-	else if(keyCmp(s,"0")==0 || keyCmp(s,"NO")==0  || keyCmp(s,"OFF")==0) {fg=0;}
-	else fg=-1;
-	return fg;
-}
 //=================================================================
 //============================= File list =========================
 //=================================================================
@@ -633,7 +618,48 @@ double Matrix::eigen(VectorX *v){
 
 	return ev;
 }
+
+
+
 //=========================================
+void initSG(int argc, char **argv){
+	for(int i=0; i<argc; i++){strtok(argv[i],"\r\n");}
+
+	char *chrom=getenv("SG_CHROM");
+	if(chrom!=0) chromFile=strdup(chrom);
+	unsigned long t=time(0);	id=(unsigned int)t;	// define run id
+	parseArgs(argc, argv);
+	for(int i=0; i<nInFiles; i++){
+		addList(inFiles[i]);	//read input files
+	}
+	if(debugFg) clearDeb();
+	makeDirs();
+	if(strlen(logFileName)==0 || keyCmp(logFileName, "null")==0) logFileName=0;
+	if(strlen(statFileName)==0 || keyCmp(statFileName, "null")==0) statFileName=0;
+	if(strlen(paramsFileName)==0 || keyCmp(paramsFileName, "null")==0) paramsFileName=0;
+	if(outChrom) writeDistr=DISTR_DETAIL;
+	if(nInFiles==0) printProgDescr();
+	readChromSizes(chromFile);							// read chromosomes
+
+	if(wStep==0)   wStep=wSize;
+	if(RScriptFg) {writeDistCorr=1; if(writeDistr==0) writeDistr=1;}
+	if(complFg==0){complFg=IGNORE_STRAND;}
+	if(customKern) kernelType=KERN_CUSTOM;
+
+	if(strlen(binPath)   ==0) binPath    =strdup(trackPath);
+	if(strlen(smoothPath)==0) smoothPath=strdup(trackPath);
+	profPath  =makePath(profPath);
+	trackPath =makePath(trackPath);
+	binPath	  =makePath(binPath);
+	smoothPath=makePath(smoothPath);
+	resPath	  =makePath(resPath);
+	if(reportPath){
+		reportPath=makePath(reportPath);
+	}
+	if(verbose) silent=false;
+}
+
+
 
 
 

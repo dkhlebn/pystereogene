@@ -542,7 +542,7 @@ void bTrack::makeBinTrack(const char *inFname){
 	verb ("******   Make binary track <%s>   ******\n", name);
 	writeLog("    Make binary track <%s>\n",name);
 	//===================================================== prepare track file name
-	if (confounder!=0)	 verb("===          pcorProfile=  <%s>\n",confounder);
+	if (confFile!=0)	 verb("===          pcorProfile=  <%s>\n",confFile);
 	trackType=getTrackType(fname);
 	//=====================================================================================
 	initProfile();                   					    //============ Allocate arrays
@@ -611,8 +611,8 @@ void Preparator(){
 		if(fname==0 || strlen(trim(fname))==0) continue;
 		prepare(fname);
 	}
-	if(confounder){
-		prepare(confounder);
+	if(confFile){
+		prepare(confFile);
 	}
 	if(fProfile) del(fProfile);
 	if(cProfile) del(cProfile);
@@ -641,6 +641,7 @@ void bTrack::writeBinnedProf(const char *fname){
 	makeExtFname(b,binPath,binSize,"bgr");
 	FILE *f=xopen(b,"w");
 	fprintf(f,"track type=bedGraph name=\"%s\" description=\"Binned track. Binsize=%i\"\n",name, binSize);
+
 	writeBedGr(f,fProfile, NA,  NA);
 	fclose(f);
 }
