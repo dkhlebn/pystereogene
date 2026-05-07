@@ -150,11 +150,11 @@ result = psg.stereoGene(["combined.mod", "CTCF.bed"], "hg38.chrom")
 
 ```python
 from pystereogene.parsing import (
-    parse_fg,        # .fg → numpy array
-    parse_bkg,       # .bkg → numpy array  
-    parse_dist,      # .dist → DataFrame (requires pandas)
-    parse_bgraph,    # .bgraph → DataFrame
-    parse_covar,     # .covar → (matrix, eigenvector, eigenvalue)
+    parse_fg,        # .fg - numpy array
+    parse_bkg,       # .bkg - numpy array  
+    parse_dist,      # .dist - DataFrame (requires pandas)
+    parse_bgraph,    # .bgraph - DataFrame
+    parse_covar,     # .covar - (matrix, eigenvector, eigenvalue)
 )
 ```
 
@@ -222,7 +222,3 @@ python -m pystereogene.build
 ## Citation
 
 > Stavrovskaya ED, et al. (2017) StereoGene: Rapid Estimation of Genome-Wide Correlation of Continuous or Interval Feature Data. *Bioinformatics* 33(20):3158-3165.
-
-## License
-
-MIT
