@@ -1,5 +1,7 @@
 """Model file builder for StereoGene track combination."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 

@@ -1,6 +1,7 @@
 """Common runner infrastructure for StereoGene binaries."""
 
-import os
+from __future__ import annotations
+
 import re
 import shutil
 import subprocess
@@ -49,13 +50,13 @@ def setup_workdir(
         version_file = cache_dir / "CACHE_VERSION"
         if version_file.exists():
             cached_version = version_file.read_text().strip()
-            if cached_version != "2.50":
+            if cached_version != "2.51":
                 raise StereoGeneError(
-                    f"StereoGene version mismatch in cache. Expected 2.50, found {cached_version}. "
+                    f"StereoGene version mismatch in cache. Expected 2.51, found {cached_version}. "
                     f"Delete cache directory and re-run: rm -rf {cache_dir}"
                 )
         else:
-            version_file.write_text("2.50\n")
+            version_file.write_text("2.51\n")
     else:
         profiles_dir = workdir / "profiles"
         profiles_dir.mkdir(exist_ok=True)
@@ -79,24 +80,39 @@ def stage_tracks(
 
     Raises:
         FileNotFoundError: If a track file doesn't exist.
-        ValueError: If too many tracks are provided.
+        ValueError: If too many tracks are provided or basenames collide.
     """
     if len(tracks) > MAX_FILES:
         raise ValueError(f"Too many input files: {len(tracks)} > {MAX_FILES}")
 
     tracks_dir = workdir / "tracks"
     staged = []
+    seen_basenames: dict[str, Path] = {}
 
     for track in tracks:
         track = Path(track).expanduser().resolve()
         if not track.exists():
             raise FileNotFoundError(f"Track file not found: {track}")
 
-        link = tracks_dir / track.name
+        basename = track.name
+        if basename in seen_basenames:
+            raise ValueError(
+                f"Duplicate track: '{basename}' appears multiple times.\n"
+                f"  First: {seen_basenames[basename]}\n"
+                f"  Again: {track}\n"
+                f"Remove duplicates or rename files if they differ."
+            )
+        seen_basenames[basename] = track
+
+        link = tracks_dir / basename
         if link.exists():
+            # Don't delete the user's file if it's already in the staging dir
+            if link.resolve() == track:
+                staged.append(basename)
+                continue
             link.unlink()
         link.symlink_to(track)
-        staged.append(track.name)
+        staged.append(basename)
 
     return staged
 
@@ -226,8 +242,11 @@ def parse_stdout_pairs(stdout: str) -> list[dict]:
         =================================
 
     Returns:
-        List of dicts with keys: track1, track2, fg_corr, bg_corr, p_value, n_fg
+        List of dicts with keys: track1, track2, fg_corr, bg_corr, p_value, n_fg.
+        Values may be math.nan if the C++ emitted NA (e.g., nWindows=0).
     """
+    import math
+
     pairs = []
     blocks = stdout.split("=================================")
 
@@ -246,17 +265,20 @@ def parse_stdout_pairs(stdout: str) -> list[dict]:
         if m:
             pair["track2"] = m.group(1)
 
-        m = re.search(r"Correlation=([\d.e+-]+)", block)
+        m = re.search(r"Correlation=([\d.e+-]+|NA)", block)
         if m:
-            pair["fg_corr"] = float(m.group(1))
+            val = m.group(1)
+            pair["fg_corr"] = math.nan if val == "NA" else float(val)
 
-        m = re.search(r"bg_cc([\d.e+-]+)", block)
+        m = re.search(r"bg_cc=?([\d.e+-]+|NA)", block)
         if m:
-            pair["bg_corr"] = float(m.group(1))
+            val = m.group(1)
+            pair["bg_corr"] = math.nan if val == "NA" else float(val)
 
-        m = re.search(r"p-val=([\d.e+-]+)", block)
+        m = re.search(r"p-val=([\d.e+-]+|NA)", block)
         if m:
-            pair["p_value"] = float(m.group(1))
+            val = m.group(1)
+            pair["p_value"] = math.nan if val == "NA" else float(val)
 
         m = re.search(r"nWindows=(\d+)", block)
         if m:

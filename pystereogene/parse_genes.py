@@ -1,13 +1,15 @@
 """ParseGenes function for extracting gene features."""
 
+from __future__ import annotations
+
+import shutil
+import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 from pystereogene._bin import get_binary
 from pystereogene.exceptions import StereoGeneError
-
-import subprocess
 
 
 @dataclass
@@ -42,7 +44,8 @@ def parse_genes(
 
     Note:
         ParseGenes does NOT use the standard config file mechanism.
-        It calls parseArgs() directly instead of initSG().
+        Output files are always kept (they ARE the result). The keep_workdir
+        parameter only affects cleanup on error when using a temp directory.
 
     Args:
         annotation: Path to GTF (GENCODE format) or BED12 (RefSeq format) file.
@@ -50,7 +53,7 @@ def parse_genes(
         gencode_level: GENCODE confidence level filter (1, 2, or 3). Default 2.
         biotypes: Gene biotypes to include (e.g., "protein_coding,lncRNA").
             Can be a string or list. If None, includes all biotypes.
-        keep_workdir: If True, don't delete the working directory after completion.
+        keep_workdir: If True, don't delete temp directory on error.
 
     Returns:
         ParseGenesResult containing paths to all 9 output BED files:
@@ -59,7 +62,7 @@ def parse_genes(
             - intron, intron_beg, intron_end: Intron bodies and boundaries
 
     Raises:
-        StereoGeneError: If ParseGenes exits with an error.
+        StereoGeneError: If ParseGenes exits with an error or produces no output.
         FileNotFoundError: If annotation file not found.
 
     Example:
@@ -84,6 +87,7 @@ def parse_genes(
         track_dir.mkdir(parents=True, exist_ok=True)
         is_temp = False
 
+    success = False
     try:
         binary = get_binary("ParseGenes")
 
@@ -118,22 +122,33 @@ def parse_genes(
         if stem.endswith(".gtf") or stem.endswith(".gff"):
             stem = Path(stem).stem
 
+        output_paths = {
+            "gene": track_dir / f"{stem}_gene.bed",
+            "gene_beg": track_dir / f"{stem}_g_beg.bed",
+            "gene_end": track_dir / f"{stem}_g_end.bed",
+            "exon": track_dir / f"{stem}_exn.bed",
+            "exon_beg": track_dir / f"{stem}_e_beg.bed",
+            "exon_end": track_dir / f"{stem}_e_end.bed",
+            "intron": track_dir / f"{stem}_ivs.bed",
+            "intron_beg": track_dir / f"{stem}_i_beg.bed",
+            "intron_end": track_dir / f"{stem}_i_end.bed",
+        }
+
+        missing = [name for name, path in output_paths.items() if not path.exists()]
+        if missing:
+            stdout_info = result.stdout[:500] if result.stdout else "(no stdout)"
+            raise StereoGeneError(
+                f"ParseGenes produced no output files. Missing: {', '.join(missing)}\n"
+                f"Command: {' '.join(cmd)}\n"
+                f"Stdout: {stdout_info}"
+            )
+
+        success = True
         return ParseGenesResult(
-            gene=track_dir / f"{stem}_gene.bed",
-            gene_beg=track_dir / f"{stem}_g_beg.bed",
-            gene_end=track_dir / f"{stem}_g_end.bed",
-            exon=track_dir / f"{stem}_exn.bed",
-            exon_beg=track_dir / f"{stem}_e_beg.bed",
-            exon_end=track_dir / f"{stem}_e_end.bed",
-            intron=track_dir / f"{stem}_ivs.bed",
-            intron_beg=track_dir / f"{stem}_i_beg.bed",
-            intron_end=track_dir / f"{stem}_i_end.bed",
+            **output_paths,
             workdir=track_dir,
         )
 
-    except Exception:
-        if is_temp and not keep_workdir:
-            import shutil
-
+    finally:
+        if not success and is_temp and not keep_workdir:
             shutil.rmtree(track_dir, ignore_errors=True)
-        raise

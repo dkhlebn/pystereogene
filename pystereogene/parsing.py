@@ -1,5 +1,7 @@
 """Output file parsers for StereoGene results."""
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING

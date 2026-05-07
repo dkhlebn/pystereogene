@@ -1,5 +1,7 @@
 """Chromosome file resolution."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 _BUNDLED = {

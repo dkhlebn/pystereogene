@@ -21,7 +21,7 @@ from pystereogene.model import ModelFile
 from pystereogene.chrom import resolve_chrom
 from pystereogene.exceptions import StereoGeneError
 
-__version__ = "2.50.0"
+__version__ = "2.51.0"
 __all__ = [
     "stereoGene",
     "StereoGeneResult",

@@ -1,5 +1,7 @@
 """Main StereoGene correlation function."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -127,6 +129,8 @@ def stereoGene(
 
 def _build_pair_results(stdout: str, workdir: Path) -> list[PairResult]:
     """Build PairResult objects from stdout and output files."""
+    import math
+
     parsed = parse_stdout_pairs(stdout)
     res_dir = workdir / "res"
 
@@ -147,13 +151,13 @@ def _build_pair_results(stdout: str, workdir: Path) -> list[PairResult]:
             PairResult(
                 track1=track1,
                 track2=track2,
-                fg_corr=p.get("fg_corr", 0.0),
-                bg_corr=p.get("bg_corr", 0.0),
-                p_value=p.get("p_value", 1.0),
+                fg_corr=p.get("fg_corr", math.nan),
+                bg_corr=p.get("bg_corr", math.nan),
+                p_value=p.get("p_value", math.nan),
                 n_fg=p.get("n_fg", 0),
-                fg_corr_sd=stats.get("FgCorr_sd", 0.0),
-                bg_corr_sd=stats.get("BgCorr_sd", 0.0),
-                mann_z=stats.get("Mann-Z", 0.0),
+                fg_corr_sd=stats.get("FgCorr_sd", math.nan),
+                bg_corr_sd=stats.get("BgCorr_sd", math.nan),
+                mann_z=stats.get("Mann-Z", math.nan),
                 n_bg=stats.get("nBkg", 0),
                 files=files,
             )

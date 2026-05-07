@@ -527,8 +527,8 @@ $ ./parse_genes [-parameters] [RefSeq or GENECODE file]";
 	_version=version;
 
 	parseArgs(argc, argv);
-	if(nfiles < 1) {printf("no input file defined"); return 0;}
-	strcpy(inFile, trim(files[0].fname));
+	if(nInFiles < 1) {printf("no input file defined\n"); return 1;}
+	strcpy(inFile, trim(inFiles[0]));
 
 	if(biotypes){
 		char *s=0;
@@ -539,21 +539,26 @@ $ ./parse_genes [-parameters] [RefSeq or GENECODE file]";
 			type_filter[i+1]=0;
 		}
 	}
-	fin=xopen(argv[1], "r");
+	fin=xopen(inFiles[0], "r");
 	int type=0;	//======================== gencode
-	char *s = strrchr(inFile,'.');
+	// Extract basename for output naming (strip directory path)
+	char *basename = strrchr(inFile, '/');
+	if(basename) basename++; else basename = inFile;
+	char outBase[4096];
+	strcpy(outBase, basename);
+	char *s = strrchr(outBase,'.');
 	if(s) {
 		*s=0; if(keyCmp(s+1,"bed")==0) type=1;		//================ refseq
 	}
-	snprintf(b,sizeof(b),"%s%s_gene.bed" ,trackPath,trim(inFile));  fgene =fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_g_beg.bed",trackPath,trim(inFile));  fg_beg=fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_g_end.bed",trackPath,trim(inFile));  fg_end=fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_exn.bed"  ,trackPath,trim(inFile));  fexn  =fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_e_beg.bed",trackPath,trim(inFile));  fe_beg=fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_e_end.bed",trackPath,trim(inFile));  fe_end=fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_ivs.bed"  ,trackPath,trim(inFile));  fivs  =fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_i_beg.bed",trackPath,trim(inFile));  fi_beg=fopen(b,"w");
-	snprintf(b,sizeof(b),"%s%s_i_end.bed",trackPath,trim(inFile));  fi_end=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_gene.bed" ,trackPath,trim(outBase));  fgene =fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_g_beg.bed",trackPath,trim(outBase));  fg_beg=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_g_end.bed",trackPath,trim(outBase));  fg_end=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_exn.bed"  ,trackPath,trim(outBase));  fexn  =fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_e_beg.bed",trackPath,trim(outBase));  fe_beg=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_e_end.bed",trackPath,trim(outBase));  fe_end=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_ivs.bed"  ,trackPath,trim(outBase));  fivs  =fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_i_beg.bed",trackPath,trim(outBase));  fi_beg=fopen(b,"w");
+	snprintf(b,sizeof(b),"%s%s_i_end.bed",trackPath,trim(outBase));  fi_end=fopen(b,"w");
 
 	if(type) parseRefSeq();
 	else parseGTF();
