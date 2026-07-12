@@ -5,7 +5,7 @@ Python wrapper for [StereoGene](https://github.com/favorov/stereogene) (v2.51) â
 ## Installation
 
 ```bash
-git clone https://github.com/<user>/pystereogene.git
+git clone https://github.com/dkhlebn/pystereogene.git
 cd pystereogene
 pip install -e .
 
